@@ -45,8 +45,6 @@ class MarshaLC:
         self.redshift = redshift
         self.classification = classification
         self.filter_dict = kwargs.pop('filter_dict', _DEFAULT_FILTERS)
-        self.selected_lc1 = []
-        self.selected_lc2 = []
         
         
         if ra is not None and dec is not None:
@@ -60,8 +58,10 @@ class MarshaLC:
         sourcefile = path/"Data/ZTF/marshal/lightcurves/"/name/("marshal_lightcurve_"+name+".csv")
         
         self.curve = pd.read_csv(sourcefile)
+        self.clean_filter()
+        dati = self.clean_lim()
         
-        tab_pd = self.curve.as_matrix()
+        tab_pd = dati.as_matrix()
         
         
         #tab_pd = Table.from_pandas(curve)
@@ -80,60 +80,33 @@ class MarshaLC:
         
         self._remove_duplicates_()
         
-  
-    
-    def selection1(self, name):
-        """Critère sur les magpsf>99 puis sur le nombre de pints min par filtre
-        """
         
+    def clean_filter(self): #METTRE INSTRUMENT PAS FILTER
+        self.light_curve = self.curve[(self.curve['instrument' ] == '"P48+ZTF"')]
         
-        data = pd.read_csv(self.path/"Data/ZTF/marshal/lightcurves/"/name
-                           /("marshal_lightcurve_"+name+".csv"))
-        
-        flag_mag = data["magpsf"]<99 
-        self.lc_mag = data[flag_mag]
-        #Rearra,ge the indexes to put the condition on the space between the julian days
-        self.lc_mag.index = pd.RangeIndex(len(self.lc_mag.index))
-        lc_r = self.lc_mag[(self.lc_mag['filter']== '"r"')]
-        lc_g = self.lc_mag[(self.lc_mag['filter'] == '"g"')]
-        
-        if (len(lc_r['magpsf']) > 4 and len(lc_g['magpsf']) > 4 and
-            (self.lc_mag['jdobs'][len(lc_mag)-1] - self.lc_mag['jdobs'][0]) > 15) :
                 
-                self.selected_lc1.append(name)
+        return self.light_curve
+        
+        
+    def clean_lim(self):
+        lc_r = self.light_curve.reset_index()
+        lc_r = lc_r.drop(['index'],axis=1)
+        r = lc_r['magpsf'] != 99
+        r_mag = lc_r[r]
+        indexes = r_mag.index.values.tolist()
+        for i in range(indexes[0], indexes[len(r_mag)-1]):
+            if lc_r['limmag'][i] != 99  and lc_r['magpsf'][i] == 99:
+                lc_r = lc_r.drop(index = i)
                 
-                
-        
-        return self.selected_lc1
-    
-    def selection2(self, name):
-        """Critère sur les magpsf>99 puis sur le nombre de pints min par filtre
-        """
-        
-        
-        data = pd.read_csv(self.path/"Data/ZTF/marshal/lightcurves/"/name
-                          /("marshal_lightcurve_"+name+".csv"))
-        
-        flag_mag = data["magpsf"]<99 
-        lc_mag = data[flag_mag]
-        #Rearra,ge the indexes to put the condition on the space between the julian days
-        self.lc_mag.index = pd.RangeIndex(len(self.lc_mag.index))
-        lc_r = lc_mag[(lc_mag['filter']== '"r"')]
-        lc_g = lc_mag[(lc_mag['filter'] == '"g"')]
-        
-        if (len(lc_r['magpsf']) > 4 and len(lc_g['magpsf']) > 4 and
-                (lc_mag['jdobs'][len(lc_mag)-1] - lc_mag['jdobs'][0]) > 20) :
-                
-            self.selected_lc2.append(name)
-                
-                
-        
-        return self.selected_lc2
-    
-    
-    
                 
             
+            
+        return lc_r
+        
+        
+        
+    
+    
     def table_sncosmo(self):
         """Table of lightcurve data in the format sncosmo requires for fitting 
         """
@@ -158,7 +131,6 @@ class MarshaLC:
             if r['magpsf'] > 90.: 
                 flux[n] = 0.
                 #eflux[n] = 10**(-0.4*(r['limmag']-zp[n]))/5.
-                #with np.seterr(all='warn'):
                 eflux[n] = np.float64(10**(-0.4*(r['limmag']-zp[n]))/5.)
                 if eflux[n] == np.inf : 
                     eflux[n] = np.uint64(10**(-0.4*(r['limmag']-zp[n]))/5.)

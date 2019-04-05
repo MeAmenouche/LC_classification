@@ -25,17 +25,17 @@ __all__ =['load_filters', '_DEFAULT_FILTERS']
 _DEFAULT_FILTERS = {
     ('P48+ZTF', 'g'): 'p48g',
     ('P48+ZTF', 'r'): 'p48r',
-    ('P48+ZTF', 'i'): 'p48i',
-    ('P60+ZTF', 'i'): 'p60i',
-    ('P60+ZTF', 'r'): 'p60r',
-    ('P60+ZTF', 'g'): 'p60g',
-    ('P60+ZTF', 'u'): 'p60u',
-    ('Swift+UVOT', 'B'): 'uvotb',
-    ('Swift+UVOT', 'u'): 'uvotu',
-    ('Swift+UVOT', 'V'): 'uvotv',
-    ('Swift+UVOT', 'UVM2'): 'uvm2',
-    ('Swift+UVOT', 'UVW1'): 'uvw1',
-    ('Swift+UVOT', 'UVW2'): 'uvw2',
+#    ('P48+ZTF', 'i'): 'p48i',
+#    ('P60+ZTF', 'i'): 'p60i',
+#    ('P60+ZTF', 'r'): 'p60r',
+#    ('P60+ZTF', 'g'): 'p60g',
+#    ('P60+ZTF', 'u'): 'p60u',
+#    ('Swift+UVOT', 'B'): 'uvotb',
+#    ('Swift+UVOT', 'u'): 'uvotu',
+#    ('Swift+UVOT', 'V'): 'uvotv',
+#    ('Swift+UVOT', 'UVM2'): 'uvm2',
+#    ('Swift+UVOT', 'UVW1'): 'uvw1',
+#    ('Swift+UVOT', 'UVW2'): 'uvw2',
 }
 
 
